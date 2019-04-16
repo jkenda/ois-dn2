@@ -15,6 +15,17 @@
 			font-weight: bold;
 			text-decoration: underline;
 		}
+
+		.dropdown {
+			position: relative;
+		}
+
+		.dropdown-menu {
+			width: 100%;
+			max-height: 350px;
+			overflow-y: auto;
+		}
+
 	</style>
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -29,58 +40,61 @@
 			<div id="stranke">
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="form-group">
-						<input type="text" class="form-control" id="FirstName" 
+						<input type="text" class="form-control" id="FirstName"
 						  name="FirstName" placeholder="Ime"/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="LastName" 
+						<input type="text" class="form-control" id="LastName"
 						  name="LastName" placeholder="Priimek"/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="Company" 
+						<input type="text" class="form-control" id="Company"
 						  name="Company" placeholder="Podjetje"/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="Address" 
+						<input type="text" class="form-control" id="Address"
 						  name="Address" placeholder="Naslov"/>
 					</div>
 					<div class="form-group">
 						<div class="ui-widget">
 							<label for="tags"></label>
-							<input type="text" class="form-control" id="City" 
-							  name="City" placeholder="Mesto"/>
+							<input type="text" class="form-control" id="City"
+							  name="City" placeholder="Mesto" autocomplete="off"/>
+							<div class="dropdown">
+							<div class="dropdown-menu"></div>
+							</div>
 						</div>
 
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="State" 
+						<input type="text" class="form-control" id="State"
 						  name="State" placeholder="Okrožje"/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="Country" 
+						<input type="text" class="form-control" id="Country"
 						  name="Country" placeholder="Država" readonly/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="PostalCode" 
+						<input type="text" class="form-control" id="PostalCode"
 						  name="PostalCode" placeholder="Poštna številka" readonly/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="Phone" 
+						<input type="text" class="form-control" id="Phone"
 						  name="Phone" placeholder="Telefon"/>
 					</div>
 					<div class="form-group">
-						<input type="text" class="form-control" id="Fax" 
+						<input type="text" class="form-control" id="Fax"
 						  name="Fax" placeholder="Faks"/>
 					</div>
 					<div class="form-group" style="text-align: left">
-						<input type="email" class="form-control" id="Email" 
-						  name="Email" placeholder="E-pošta" 
+						<input type="email" class="form-control" id="Email"
+						  name="Email" placeholder="E-pošta"
 						  style="width: 90%;margin-right: 10px;display: inline;"/>
 						<span id="EmailValidate" class="glyphicon glyphicon-remove"></span>
 					</div>
 					<div class="form-group">
 						<p class="help-block"><%= sporocilo %></p>
-						<input type="submit" id="Register" class="btn btn-default" 
+						<input type="submit" id="Register" class="btn btn-default"
 						  value="Registracija" disabled/>
 					</div>
 				</form>
@@ -90,12 +104,12 @@
 		<div class="col-md-6">
 			<h3><span class="glyphicon glyphicon-hand-right"></span> Izbira stranke</h3>
 			<div id="seznam1">
-				<form action="/stranka" method="post" enctype="multipart/form-data">
+				<form action="/stranka" method="get" enctype="multipart/form-data">
 					<div class="form-group">
 						<select size="10" id="seznamStrank" name="seznamStrank" class="form-control">
 							<% seznamStrank.forEach(function(stranka) { %>
 							<option value="<%= stranka.CustomerId %>">
-								<%= stranka.FirstName %> <%= stranka.LastName %>, <%= stranka.Email %>
+								<%= stranka.FirstName %> <%= stranka.LastName %>, <%= stranka.Email %> :: <%= stranka.Country %> (<%= stranka.StRacunov %>)
 							</option>
 							<% }) %>
 						</select>
@@ -131,18 +145,124 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
-	$(document).ready(function () {
-		var emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i;
 
-		document.getElementById("City").addEventListener("keyup", function () {
-			if (this.value.length == 0) {
-				document.getElementById("PostalCode").value = "";
-				document.getElementById("Country").value = "";
-				document.getElementById("Register").disabled = true;
+
+	window.addEventListener("load", function() {
+		const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i;
+
+		var postneStevilke;
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (xhttp.readyState == 4 && xhttp.status == 200) {
+				postneStevilke = JSON.parse(xhttp.responseText);
 			}
+		};
+		xhttp.open("GET", "https://api.lavbic.net/kraji", true);
+		xhttp.send();
 
+		const city       = document.getElementById("City");
+		const postalCode = document.getElementById("PostalCode");
+		const country    = document.getElementById("Country");
+		const dropdown   = document.querySelector(".dropdown-menu");
+
+		const ostalaPolja = [ document.getElementById("FirstName"),
+													document.getElementById("LastName"), document.getElementById("Company"),
+													document.getElementById("State"),
+													document.getElementById("Phone"),
+													document.getElementById("Fax") ]
+
+		var validEmail = false;
+
+		city.addEventListener("keyup", function() {
+			if (this.value.length == 0) {
+				postalCode.value = "";
+				country.value = "";
+				dropdown.style.display = "none";
+			}
+			else {
+				autocomplete(RegExp("^" + city.value, "i"));
+				izpolni();
+			}
+			enableRegister();
 		});
+
+		const email = document.getElementById("Email");
+		const emailValidate = document.getElementById("EmailValidate");
+		const register   = document.getElementById("Register");
+
+		email.addEventListener("keyup", function() {
+			if (emailRegex.test(this.value)) {
+				emailValidate.className = "glyphicon glyphicon-ok";
+				validEmail = true;
+			}
+			else {
+				emailValidate.className = "glyphicon glyphicon-remove";
+				validEmail = false;
+			}
+			enableRegister();
+		});
+
+		for (var i = 0; i < ostalaPolja.length; i++) ostalaPolja[i].addEventListener("keyup", enableRegister);
+
+		function autocomplete(zacetnice) {
+			dropdown.innerHTML = "";
+			for (var i = 0; i < postneStevilke.length; i++) {
+				if (zacetnice.test(postneStevilke[i].kraj)) {
+					// console.log(postneStevilke[i].kraj + " OK");
+					dropdown.innerHTML += "<li><a class='dropdown-item'>" + postneStevilke[i].kraj + "</a></li>";
+				}
+			}
+			if (dropdown.innerHTML == "") dropdown.style.display = "none";
+			else dropdown.style.display = "block";
+			var predikcije = document.querySelectorAll(".dropdown-item");
+			for (var i = 0; i < predikcije.length; i++) {
+				// console.log(predikcije[i].innerHTML);
+				predikcije[i].addEventListener("click", function() {
+					city.value = this.innerHTML;
+					dropdown.style.display = "none";
+					izpolni();
+				});
+			}
+		}
+
+		function izpolni() {
+			for (var i = 0; i < postneStevilke.length; i++) {
+				if (postneStevilke[i].kraj == city.value) {
+					postalCode.value = postneStevilke[i].postnaStevilka;
+					country.value = "Slovenija";
+				}
+			}
+			enableRegister();
+		}
+
+		function enableRegister() {
+			var prazno = false;
+			for (var i = 0; i < ostalaPolja.length; i++) {
+				if (ostalaPolja[i].value == "") {
+					register.disabled = true;
+					return;
+				}
+			}
+			if (validEmail) register.disabled = false;
+		}
+
+		const seznamStrank = document.querySelector("#seznamStrank");
+		seznamStrank.addEventListener("change", highlight);
+
+		function highlight() {
+			var c = 0;
+			const seznamRacunov = document.querySelector("#seznamRacunov");
+			for (var i = 0; i < seznamRacunov.length; i++) {
+				if (seznamStrank.options[seznamStrank.selectedIndex].value == seznamRacunov[i].getAttribute("customerid")) {
+					seznamRacunov[i].className = "racun-stranke";
+					c++;
+				}
+				else seznamRacunov[i].className = "";
+			}
+			console.log(c);
+		}
 	});
+
 </script>
 </body>
 </html>

@@ -55,8 +55,8 @@ function vrniNazivStranke(strankaId, povratniKlic) {
   pb.all(
     "SELECT Customer.FirstName  || ' ' || Customer.LastName AS naziv \
     FROM    Customer \
-    WHERE   Customer.CustomerId = " + strankaId, 
-    {}, 
+    WHERE   Customer.CustomerId = " + strankaId,
+    {},
     function (napaka, vrstica) {
       if (napaka) {
         povratniKlic("");
@@ -95,7 +95,7 @@ streznik.get("/", function(zahteva, odgovor) {
           );
         }
         vrniNazivStranke(
-          zahteva.session.trenutnaStranka, 
+          zahteva.session.trenutnaStranka,
           function(nazivOdgovor) {
             odgovor.render("seznam", {
               seznamPesmi: vrstice,
@@ -174,7 +174,7 @@ var casIzvajanjaKosarice = function(zahteva, povratniKlic) {
     pb.get(
       "SELECT SUM(Milliseconds) / 60000 AS cas \
       FROM    Track \
-      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")", 
+      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")",
       function (napaka, vrstica) {
         if (napaka) {
           povratniKlic(false);
@@ -212,7 +212,7 @@ var pesmiIzRacuna = function(racunId, povratniKlic) {
               SELECT  InvoiceLine.TrackId \
               FROM    InvoiceLine, Invoice \
               WHERE   InvoiceLine.InvoiceId = Invoice.InvoiceId AND \
-                      Invoice.InvoiceId = " + racunId + 
+                      Invoice.InvoiceId = " + racunId +
             ")",
     function(napaka, vrstice) {
       console.log(vrstice);
@@ -242,7 +242,7 @@ var stranka = function(strankaId, povratniKlic) {
   pb.get(
     "SELECT Customer.* \
     FROM    Customer \
-    WHERE   Customer.CustomerId = $cid", 
+    WHERE   Customer.CustomerId = $cid",
     {},
     function(napaka, vrstica) {
       povratniKlic(false);
@@ -292,7 +292,8 @@ var vrniRacune = function(povratniKlic) {
     "SELECT Customer.FirstName || ' ' || Customer.LastName || \
             ' (' || Invoice.InvoiceId || ') - ' || \
             date(Invoice.InvoiceDate) AS Naziv, \
-            Invoice.InvoiceId \
+            Invoice.InvoiceId, \
+            Invoice.CustomerId \
     FROM    Customer, Invoice \
     WHERE   Customer.CustomerId = Invoice.CustomerId",
     function (napaka, vrstice) {
@@ -312,15 +313,18 @@ streznik.post("/prijava", function(zahteva, odgovor) {
                             Phone, Fax, Email, SupportRepId) \
       VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
               $fax, $email, $sri)",
-      {}, 
+      {},
       function(napaka) {
         vrniStranke(function(napaka1, stranke) {
           vrniRacune(function(napaka2, racuni) {
+            for (var i=0; i < stranke.length; i++) {
+              stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
+            }
             odgovor.render(
-              "prijava", 
+              "prijava",
               {
-                sporocilo: "", 
-                seznamStrank: stranke, 
+                sporocilo: "",
+                seznamStrank: stranke,
                 seznamRacunov: racuni
               }
             );
@@ -338,7 +342,7 @@ function prestejRacuneZaStranko(stranka, racuni) {
       stevec++;
     }
   }
-  
+
   return stevec;
 }
 
@@ -350,10 +354,10 @@ streznik.get("/prijava", function(zahteva, odgovor) {
         stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
       }
       odgovor.render(
-        "prijava", 
+        "prijava",
         {
-          sporocilo: "", 
-          seznamStrank: stranke, 
+          sporocilo: "",
+          seznamStrank: stranke,
           seznamRacunov: racuni
         }
       );
