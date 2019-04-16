@@ -55,8 +55,8 @@ function vrniNazivStranke(strankaId, povratniKlic) {
   pb.all(
     "SELECT Customer.FirstName  || ' ' || Customer.LastName AS naziv \
     FROM    Customer \
-    WHERE   Customer.CustomerId = " + strankaId, 
-    {}, 
+    WHERE   Customer.CustomerId = " + strankaId,
+    {},
     function (napaka, vrstica) {
       if (napaka) {
         povratniKlic("");
@@ -95,7 +95,7 @@ streznik.get("/", function(zahteva, odgovor) {
           );
         }
         vrniNazivStranke(
-          zahteva.session.trenutnaStranka, 
+          zahteva.session.trenutnaStranka,
           function(nazivOdgovor) {
             odgovor.render("seznam", {
               seznamPesmi: vrstice,
@@ -163,7 +163,12 @@ var pesmiIzKosarice = function(zahteva, povratniKlic) {
 // Vrni podrobnosti pesmi v košarici iz trenutne seje vključno s časom izvajanja
 streznik.get("/podrobnosti", function(zahteva, odgovor) {
     var pesmi = zahteva.session.kosarica ? zahteva.session.kosarica.length : 0;
-    var cas = casIzvajanjaKosarice(zahteva, function() { return cas; });
+    var cas = casIzvajanjaKosarice(zahteva, function(cas) {
+      odgovor.send({
+                    pesmi: pesmi,
+                    cas: cas }
+                  );
+    });
 });
 
 // Vrni čas izvajanja pesmi v košarici iz podatkovne baze
@@ -174,7 +179,7 @@ var casIzvajanjaKosarice = function(zahteva, povratniKlic) {
     pb.get(
       "SELECT SUM(Milliseconds) / 60000 AS cas \
       FROM    Track \
-      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")", 
+      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")",
       function (napaka, vrstica) {
         if (napaka) {
           povratniKlic(false);
@@ -195,6 +200,17 @@ streznik.get("/kosarica", function(zahteva, odgovor) {
   });
 });
 
+streznik.get("/izbrisiKosarico", function(zahteva, odgovor) {
+  if (!zahteva.session.kosarica || zahteva.session.kosarica.length == 0) {
+    odgovor.send(true);
+  }
+  else {
+    zahteva.session.kosarica = null;
+    odgovor.send(false);
+  }
+  console.log(zahteva.session.kosarica);
+});
+
 // Vrni podrobnosti pesmi na računu
 var pesmiIzRacuna = function(racunId, povratniKlic) {
   pb.all(
@@ -212,7 +228,7 @@ var pesmiIzRacuna = function(racunId, povratniKlic) {
               SELECT  InvoiceLine.TrackId \
               FROM    InvoiceLine, Invoice \
               WHERE   InvoiceLine.InvoiceId = Invoice.InvoiceId AND \
-                      Invoice.InvoiceId = " + racunId + 
+                      Invoice.InvoiceId = " + racunId +
             ")",
     function(napaka, vrstice) {
       console.log(vrstice);
@@ -242,7 +258,7 @@ var stranka = function(strankaId, povratniKlic) {
   pb.get(
     "SELECT Customer.* \
     FROM    Customer \
-    WHERE   Customer.CustomerId = $cid", 
+    WHERE   Customer.CustomerId = $cid",
     {},
     function(napaka, vrstica) {
       povratniKlic(false);
@@ -312,15 +328,15 @@ streznik.post("/prijava", function(zahteva, odgovor) {
                             Phone, Fax, Email, SupportRepId) \
       VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
               $fax, $email, $sri)",
-      {}, 
+      {},
       function(napaka) {
         vrniStranke(function(napaka1, stranke) {
           vrniRacune(function(napaka2, racuni) {
             odgovor.render(
-              "prijava", 
+              "prijava",
               {
-                sporocilo: "", 
-                seznamStrank: stranke, 
+                sporocilo: "",
+                seznamStrank: stranke,
                 seznamRacunov: racuni
               }
             );
@@ -338,7 +354,7 @@ function prestejRacuneZaStranko(stranka, racuni) {
       stevec++;
     }
   }
-  
+
   return stevec;
 }
 
@@ -350,10 +366,10 @@ streznik.get("/prijava", function(zahteva, odgovor) {
         stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
       }
       odgovor.render(
-        "prijava", 
+        "prijava",
         {
-          sporocilo: "", 
-          seznamStrank: stranke, 
+          sporocilo: "",
+          seznamStrank: stranke,
           seznamRacunov: racuni
         }
       );
