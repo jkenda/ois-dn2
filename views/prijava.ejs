@@ -17,21 +17,15 @@
 		}
 
 		.dropdown {
-			display: none;
-			position: absolute;
-			background-color: #f1f1f1;
-			z-index: 1;
-			width: 95%;
-			border: 1px solid transparent;
-			border-color: black;
-			border-radius: 4px;
-			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			text-align: left;
-			cursor: pointer;
+			position: relative;
 		}
-		.dropdown div:hover {
-			background-color: lightgray;
+
+		.dropdown-menu {
+			width: 100%;
+			max-height: 350px;
+			overflow-y: auto;
 		}
+
 	</style>
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -65,9 +59,10 @@
 						<div class="ui-widget">
 							<label for="tags"></label>
 							<input type="text" class="form-control" id="City"
-							  name="City" placeholder="Mesto"/>
-								<div class="dropdown">
-							  </div>
+							  name="City" placeholder="Mesto" autocomplete="off"/>
+							<div class="dropdown">
+							<div class="dropdown-menu"></div>
+							</div>
 						</div>
 
 					</div>
@@ -109,7 +104,7 @@
 		<div class="col-md-6">
 			<h3><span class="glyphicon glyphicon-hand-right"></span> Izbira stranke</h3>
 			<div id="seznam1">
-				<form action="/stranka" method="post" enctype="multipart/form-data">
+				<form action="/stranka" method="get" enctype="multipart/form-data">
 					<div class="form-group">
 						<select size="10" id="seznamStrank" name="seznamStrank" class="form-control">
 							<% seznamStrank.forEach(function(stranka) { %>
@@ -160,7 +155,6 @@
 		xhttp.onreadystatechange = function() {
 			if (xhttp.readyState == 4 && xhttp.status == 200) {
 				postneStevilke = JSON.parse(xhttp.responseText);
-				postneStevilke.pop();
 			}
 		};
 		xhttp.open("GET", "https://api.lavbic.net/kraji", true);
@@ -169,7 +163,13 @@
 		const city       = document.getElementById("City");
 		const postalCode = document.getElementById("PostalCode");
 		const country    = document.getElementById("Country");
-		const dropdown   = document.querySelector(".dropdown");
+		const dropdown   = document.querySelector(".dropdown-menu");
+
+		const ostalaPolja = [ document.getElementById("FirstName"),
+													document.getElementById("LastName"), document.getElementById("Company"),
+													document.getElementById("State"),
+													document.getElementById("Phone"),
+													document.getElementById("Fax") ]
 
 		var validEmail = false;
 
@@ -202,20 +202,21 @@
 			enableRegister();
 		});
 
+		for (var i = 0; i < ostalaPolja.length; i++) ostalaPolja[i].addEventListener("keyup", enableRegister);
+
 		function autocomplete(zacetnice) {
 			dropdown.innerHTML = "";
-			for (i in postneStevilke) {
+			for (var i = 0; i < postneStevilke.length; i++) {
 				if (zacetnice.test(postneStevilke[i].kraj)) {
 					// console.log(postneStevilke[i].kraj + " OK");
-					dropdown.innerHTML += "<div>" + postneStevilke[i].kraj + "</div>";
+					dropdown.innerHTML += "<li><a class='dropdown-item'>" + postneStevilke[i].kraj + "</a></li>";
 				}
 			}
 			if (dropdown.innerHTML == "") dropdown.style.display = "none";
 			else dropdown.style.display = "block";
-
-			var predikcije = document.querySelectorAll(".dropdown div");
-			for (i in predikcije) {
-				console.log(predikcije[i].innerHTML);
+			var predikcije = document.querySelectorAll(".dropdown-item");
+			for (var i = 0; i < predikcije.length; i++) {
+				// console.log(predikcije[i].innerHTML);
 				predikcije[i].addEventListener("click", function() {
 					city.value = this.innerHTML;
 					dropdown.style.display = "none";
@@ -225,7 +226,7 @@
 		}
 
 		function izpolni() {
-			for (i in postneStevilke) {
+			for (var i = 0; i < postneStevilke.length; i++) {
 				if (postneStevilke[i].kraj == city.value) {
 					postalCode.value = postneStevilke[i].postnaStevilka;
 					country.value = "Slovenija";
@@ -235,8 +236,14 @@
 		}
 
 		function enableRegister() {
-			if (postalCode.value != "" && country.value != "" && validEmail) register.disabled = false;
-			else register.disabled = true;
+			var prazno = false;
+			for (var i = 0; i < ostalaPolja.length; i++) {
+				if (ostalaPolja[i].value == "") {
+					register.disabled = true;
+					return;
+				}
+			}
+			if (validEmail) register.disabled = false;
 		}
 	});
 

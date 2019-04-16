@@ -55,8 +55,8 @@ function vrniNazivStranke(strankaId, povratniKlic) {
   pb.all(
     "SELECT Customer.FirstName  || ' ' || Customer.LastName AS naziv \
     FROM    Customer \
-    WHERE   Customer.CustomerId = " + strankaId, 
-    {}, 
+    WHERE   Customer.CustomerId = " + strankaId,
+    {},
     function (napaka, vrstica) {
       if (napaka) {
         povratniKlic("");
@@ -95,7 +95,7 @@ streznik.get("/", function(zahteva, odgovor) {
           );
         }
         vrniNazivStranke(
-          zahteva.session.trenutnaStranka, 
+          zahteva.session.trenutnaStranka,
           function(nazivOdgovor) {
             odgovor.render("seznam", {
               seznamPesmi: vrstice,
@@ -174,7 +174,7 @@ var casIzvajanjaKosarice = function(zahteva, povratniKlic) {
     pb.get(
       "SELECT SUM(Milliseconds) / 60000 AS cas \
       FROM    Track \
-      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")", 
+      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")",
       function (napaka, vrstica) {
         if (napaka) {
           povratniKlic(false);
@@ -212,7 +212,7 @@ var pesmiIzRacuna = function(racunId, povratniKlic) {
               SELECT  InvoiceLine.TrackId \
               FROM    InvoiceLine, Invoice \
               WHERE   InvoiceLine.InvoiceId = Invoice.InvoiceId AND \
-                      Invoice.InvoiceId = " + racunId + 
+                      Invoice.InvoiceId = " + racunId +
             ")",
     function(napaka, vrstice) {
       console.log(vrstice);
@@ -242,7 +242,7 @@ var stranka = function(strankaId, povratniKlic) {
   pb.get(
     "SELECT Customer.* \
     FROM    Customer \
-    WHERE   Customer.CustomerId = $cid", 
+    WHERE   Customer.CustomerId = $cid",
     {},
     function(napaka, vrstica) {
       povratniKlic(false);
@@ -304,7 +304,6 @@ var vrniRacune = function(povratniKlic) {
 // Registracija novega uporabnika
 streznik.post("/prijava", function(zahteva, odgovor) {
   var form = new formidable.IncomingForm();
-
   form.parse(zahteva, function (napaka, polja, datoteke) {
     pb.run(
       "INSERT INTO Customer (FirstName, LastName, Company, \
@@ -312,15 +311,19 @@ streznik.post("/prijava", function(zahteva, odgovor) {
                             Phone, Fax, Email, SupportRepId) \
       VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
               $fax, $email, $sri)",
-      {}, 
+      {$fn: polja.FirstName, $ln: polja.LastName,
+      $com: polja.Company, $addr: polja.Address, $city: polja.City, $state: polja.State, $country: polja.Country,
+      $pc: polja.PostalCode, $phone: polja.Phone, $fax: polja.Fax, $email: polja.Email, $sri: 9},
       function(napaka) {
+        console.log(polja);
         vrniStranke(function(napaka1, stranke) {
           vrniRacune(function(napaka2, racuni) {
             odgovor.render(
-              "prijava", 
+              "prijava",
               {
-                sporocilo: "", 
-                seznamStrank: stranke, 
+                sporocilo: napaka ? "Prišlo je do napake pri dodajanju nove stranke. Prosim, preverite vnešene podatke in poskusite znova."
+                : "Stranka " + polja.FirstName + " " + polja.LastName + " je bila uspešno dodana.",
+                seznamStrank: stranke,
                 seznamRacunov: racuni
               }
             );
@@ -338,7 +341,7 @@ function prestejRacuneZaStranko(stranka, racuni) {
       stevec++;
     }
   }
-  
+
   return stevec;
 }
 
@@ -350,10 +353,10 @@ streznik.get("/prijava", function(zahteva, odgovor) {
         stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
       }
       odgovor.render(
-        "prijava", 
+        "prijava",
         {
-          sporocilo: "", 
-          seznamStrank: stranke, 
+          sporocilo: "",
+          seznamStrank: stranke,
           seznamRacunov: racuni
         }
       );
