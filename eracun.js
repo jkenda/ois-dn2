@@ -55,8 +55,8 @@ function vrniNazivStranke(strankaId, povratniKlic) {
   pb.all(
     "SELECT Customer.FirstName  || ' ' || Customer.LastName AS naziv \
     FROM    Customer \
-    WHERE   Customer.CustomerId = " + strankaId, 
-    {}, 
+    WHERE   Customer.CustomerId = " + strankaId,
+    {},
     function (napaka, vrstica) {
       if (napaka) {
         povratniKlic("");
@@ -95,7 +95,7 @@ streznik.get("/", function(zahteva, odgovor) {
           );
         }
         vrniNazivStranke(
-          zahteva.session.trenutnaStranka, 
+          zahteva.session.trenutnaStranka,
           function(nazivOdgovor) {
             odgovor.render("seznam", {
               seznamPesmi: vrstice,
@@ -174,7 +174,7 @@ var casIzvajanjaKosarice = function(zahteva, povratniKlic) {
     pb.get(
       "SELECT SUM(Milliseconds) / 60000 AS cas \
       FROM    Track \
-      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")", 
+      WHERE   Track.TrackId IN (" + zahteva.session.kosarica.join(",") + ")",
       function (napaka, vrstica) {
         if (napaka) {
           povratniKlic(false);
@@ -212,15 +212,17 @@ var pesmiIzRacuna = function(racunId, povratniKlic) {
               SELECT  InvoiceLine.TrackId \
               FROM    InvoiceLine, Invoice \
               WHERE   InvoiceLine.InvoiceId = Invoice.InvoiceId AND \
-                      Invoice.InvoiceId = " + racunId + 
+                      Invoice.InvoiceId = " + racunId +
             ")",
     function(napaka, vrstice) {
-      console.log(vrstice);
+      for (var i = 0; i < vrstice.length; i++)
+        vrstice[i].stopnja = davcnaStopnja(vrstice[i].izvajalec, vrstice[i].zanr);
+      povratniKlic(vrstice);
     });
 };
 
 // Vrni podrobnosti o stranki iz računa
-var strankaIzRacuna = function(racunId, callback) {
+var strankaIzRacuna = function(racunId, povratniKlic) {
   pb.all(
     "SELECT Customer.* \
     FROM    Customer, Invoice \
@@ -228,21 +230,44 @@ var strankaIzRacuna = function(racunId, callback) {
             Invoice.InvoiceId = " + racunId,
     function(napaka, vrstice) {
       console.log(vrstice);
+      povratniKlic(vrstice[0]);
     });
 };
 
 // Izpis računa v HTML predstavitvi na podlagi podatkov iz baze
 streznik.post("/izpisiRacunBaza", function(zahteva, odgovor) {
   var form = new formidable.IncomingForm();
-
-  odgovor.end();
+  form.parse(zahteva, function(napaka, polja, datoteke) {
+    strankaIzRacuna(polja.seznamRacunov, function(stranka) {
+      pesmiIzRacuna(polja.seznamRacunov, function(pesmi) {
+        odgovor.setHeader("Content-Type", "text/xml");
+        odgovor.render(
+          "eslog",
+          {
+            vizualiziraj: true,
+            NazivPartnerja1: stranka.FirstName + " " + stranka.LastName,
+            Ulica1: stranka.Address,
+            Kraj: stranka.City + " (" + stranka.State + ")",
+            NazivDrzave: stranka.Country,
+            PostnaStevilka: stranka.PostalCode,
+            StevilkaKomunikacije1: stranka.Email,
+            StevilkaKomunikacije2: stranka.Phone,
+            ImeOsebe: stranka.FirstName + " " + stranka.LastName,
+            PodatekPodjetja: stranka.CustomerId,
+            casPripraveMinute: Date. 
+            postavkeRacuna: pesmi
+          }
+        );
+      });
+    });
+  });
 });
 
 var stranka = function(strankaId, povratniKlic) {
   pb.get(
     "SELECT Customer.* \
     FROM    Customer \
-    WHERE   Customer.CustomerId = $cid", 
+    WHERE   Customer.CustomerId = $cid",
     {},
     function(napaka, vrstica) {
       povratniKlic(false);
@@ -312,15 +337,15 @@ streznik.post("/prijava", function(zahteva, odgovor) {
                             Phone, Fax, Email, SupportRepId) \
       VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
               $fax, $email, $sri)",
-      {}, 
+      {},
       function(napaka) {
         vrniStranke(function(napaka1, stranke) {
           vrniRacune(function(napaka2, racuni) {
             odgovor.render(
-              "prijava", 
+              "prijava",
               {
-                sporocilo: "", 
-                seznamStrank: stranke, 
+                sporocilo: "",
+                seznamStrank: stranke,
                 seznamRacunov: racuni
               }
             );
@@ -338,7 +363,7 @@ function prestejRacuneZaStranko(stranka, racuni) {
       stevec++;
     }
   }
-  
+
   return stevec;
 }
 
@@ -350,10 +375,10 @@ streznik.get("/prijava", function(zahteva, odgovor) {
         stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
       }
       odgovor.render(
-        "prijava", 
+        "prijava",
         {
-          sporocilo: "", 
-          seznamStrank: stranke, 
+          sporocilo: "",
+          seznamStrank: stranke,
           seznamRacunov: racuni
         }
       );

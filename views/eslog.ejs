@@ -173,14 +173,14 @@
 			<NazivNaslovPodjetja>
 				<VrstaPartnerja>BY</VrstaPartnerja>
 				<NazivPartnerja>
-					<NazivPartnerja1>Univerza v Ljubljani</NazivPartnerja1>
+					<NazivPartnerja1><%= NazivPartnerja1 != null ? NazivPartnerja1 : "Univerza v Ljubljani" %></NazivPartnerja1>
 				</NazivPartnerja>
 				<Ulica>
-					<Ulica1>Večna pot 113</Ulica1>
+					<Ulica1><%= Ulica1 != null ? Ulica1 : "Večna pot 113" %></Ulica1>
 				</Ulica>
-				<Kraj>Ljubljana</Kraj>
-				<NazivDrzave>Slovenija</NazivDrzave>
-				<PostnaStevilka>SI</PostnaStevilka>
+				<Kraj><%= Kraj != null ? Kraj : "Ljubljana" %></Kraj>
+				<NazivDrzave><%= NazivDrzave != null ? NazivDrzave : "Slovenija" %></NazivDrzave>
+				<PostnaStevilka><%= PostnaStevilka != null ? PostnaStevilka : "SI" %></PostnaStevilka>
 				<KodaDrzave></KodaDrzave>
 			</NazivNaslovPodjetja>
 			<FinancniPodatkiPodjetja>
@@ -201,18 +201,18 @@
 			</ReferencniPodatkiPodjetja>
 			<ReferencniPodatkiPodjetja>
 				<VrstaPodatkaPodjetja>IT</VrstaPodatkaPodjetja>
-				<PodatekPodjetja>11-22-33-44</PodatekPodjetja>
+				<PodatekPodjetja><%= PodatekPodjetja != null ? PodatekPodjetja : "11-22-33-44" %></PodatekPodjetja>
 			</ReferencniPodatkiPodjetja>
 			<KontaktiPodjetja>
 				<KontaktnaOseba>
-					<ImeOsebe>Dejan Lavbič</ImeOsebe>
+					<ImeOsebe><%= ImeOsebe != null ? ImeOsebe : "Dejan Lavbič" %></ImeOsebe>
 				</KontaktnaOseba>
 				<Komunikacije>
-					<StevilkaKomunikacije>gmail@chucknorris.com</StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= StevilkaKomunikacije1 != null ? StevilkaKomunikacije1 : "gmail@chucknorris.com" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>EM</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
-					<StevilkaKomunikacije>38612419350</StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= StevilkaKomunikacije2 != null ? StevilkaKomunikacije2 : "38612419350" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>TE</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
@@ -318,20 +318,20 @@
 		<%
 			var zanri = {};
 			var pesmi = 0;
-			
+
 			for (var i=0; i < postavkeRacuna.length; i++) {
 				if (postavkeRacuna[i].zanr in zanri) {
 					zanri[postavkeRacuna[i].zanr]++;
 				} else {
 					zanri[postavkeRacuna[i].zanr] = 1
 				}
-				if (postavkeRacuna[i].opisArtikla.endsWith("(Iron Maiden)") || 
+				if (postavkeRacuna[i].opisArtikla.endsWith("(Iron Maiden)") ||
 						postavkeRacuna[i].opisArtikla.endsWith("(Body Count)")) {
 							pesmi++;
 				}
 			}
-			
-			var skupniPopust = 
+
+			var skupniPopust =
 				(postavkeRacuna.length >= 5 ? 20 : 0) +
 				(pesmi > 1 ? 5 : 0) +
 				(new Date().getMinutes() <= 30 ? 1 : 0);
@@ -342,10 +342,10 @@
 				}
 			}
 
-			var vsotaSPopustiInDavki = 0, 
-					vsotaZneskovDdv = 0, 
+			var vsotaSPopustiInDavki = 0,
+					vsotaZneskovDdv = 0,
 					vsotaOsnovZaDdv = 0,
-					vsotaVrednosti = 0, 
+					vsotaVrednosti = 0,
 					vsotaPopustov = 0;
 			var vsoteOsnovZaDdv = { "0": 0, "9.5": 0, "22": 0};
 			var vsoteZneskovDdv = { "0": 0, "9.5": 0, "22": 0};
@@ -356,7 +356,7 @@
 				popust = postavkeRacuna[i].kolicina * postavkeRacuna[i].cena * (popustStopnja/100);
 				osnovaZaDdv = vrednost - popust;
 				ddv = osnovaZaDdv * (davcnaStopnja/100);
-				
+
 				vsoteOsnovZaDdv["" + davcnaStopnja] += osnovaZaDdv;
 				vsoteZneskovDdv["" + davcnaStopnja] += ddv;
 				vsotaSPopustiInDavki += (osnovaZaDdv + ddv);
