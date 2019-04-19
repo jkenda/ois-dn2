@@ -254,7 +254,6 @@ streznik.post("/izpisiRacunBaza", function(zahteva, odgovor) {
             StevilkaKomunikacije2: stranka.Phone,
             ImeOsebe: stranka.FirstName + " " + stranka.LastName,
             PodatekPodjetja: stranka.CustomerId,
-            casPripraveMinute: Date. 
             postavkeRacuna: pesmi
           }
         );
