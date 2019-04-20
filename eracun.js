@@ -244,15 +244,16 @@ streznik.post("/izpisiRacunBaza", function(zahteva, odgovor) {
           "eslog",
           {
             vizualiziraj: true,
-            NazivPartnerja1: stranka.FirstName + " " + stranka.LastName,
-            Ulica1: stranka.Address,
-            Kraj: stranka.City + " (" + stranka.State + ")",
-            NazivDrzave: stranka.Country,
-            PostnaStevilka: stranka.PostalCode,
-            StevilkaKomunikacije1: stranka.Email,
-            StevilkaKomunikacije2: stranka.Phone,
-            ImeOsebe: stranka.FirstName + " " + stranka.LastName,
-            PodatekPodjetja: stranka.CustomerId,
+            FirstName: stranka.FirstName,
+            LastName: stranka.LastName,
+            Address: stranka.Address,
+            City: stranka.City,
+            State: stranka.State,
+            Country: stranka.Country,
+            PostalCode: stranka.PostalCode,
+            Email: stranka.Email,
+            Phone: stranka.Phone,
+            CustomerId: stranka.CustomerId,
             postavkeRacuna: pesmi
           }
         );
