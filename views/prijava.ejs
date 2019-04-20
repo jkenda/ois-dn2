@@ -151,14 +151,9 @@
 		const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i;
 
 		var postneStevilke;
-		const xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function() {
-			if (xhttp.readyState == 4 && xhttp.status == 200) {
-				postneStevilke = JSON.parse(xhttp.responseText);
-			}
-		};
-		xhttp.open("GET", "https://api.lavbic.net/kraji", true);
-		xhttp.send();
+		$.get("https://api.lavbic.net/kraji", function(kraji) {
+			postneStevilke = kraji;
+		});
 
 		const city       = document.getElementById("City");
 		const postalCode = document.getElementById("PostalCode");
