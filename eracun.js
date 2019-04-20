@@ -229,7 +229,6 @@ var strankaIzRacuna = function(racunId, povratniKlic) {
     WHERE   Customer.CustomerId = Invoice.CustomerId AND \
             Invoice.InvoiceId = " + racunId,
     function(napaka, vrstice) {
-      console.log(vrstice);
       povratniKlic(vrstice[0]);
     });
 };
@@ -263,14 +262,17 @@ streznik.post("/izpisiRacunBaza", function(zahteva, odgovor) {
 });
 
 var stranka = function(strankaId, povratniKlic) {
-  pb.get(
-    "SELECT Customer.* \
-    FROM    Customer \
-    WHERE   Customer.CustomerId = $cid",
-    {},
-    function(napaka, vrstica) {
-      povratniKlic(false);
-    });
+  if (strankaId == null) povratniKlic({});
+  else {
+    pb.get(
+      "SELECT Customer.* \
+      FROM    Customer \
+      WHERE   Customer.CustomerId = $cid",
+      {$cid: strankaId},
+      function(napaka, vrstica) {
+        povratniKlic(vrstica);
+      });
+  }
 };
 
 // Izpis računa v HTML predstavitvi ali izvorni XML obliki
@@ -284,14 +286,25 @@ streznik.get("/izpisiRacun/:oblika", function(zahteva, odgovor) {
         zato računa ni mogoče pripraviti!</p>"
       );
     } else {
-      odgovor.setHeader("Content-Type", "text/xml");
-      odgovor.render(
-        "eslog",
-        {
-          vizualiziraj: zahteva.params.oblika == "html",
-          postavkeRacuna: pesmi
-        }
-      );
+      stranka(zahteva.session.trenutnaStranka, function(stranka) {
+        odgovor.setHeader("Content-Type", "text/xml");
+        odgovor.render(
+          "eslog",
+          {
+            vizualiziraj: zahteva.params.oblika == "html",
+            NazivPartnerja1: stranka.FirstName + " " + stranka.LastName,
+            Ulica1: stranka.Address,
+            Kraj: stranka.City + " (" + stranka.State + ")",
+            NazivDrzave: stranka.Country,
+            PostnaStevilka: stranka.PostalCode,
+            StevilkaKomunikacije1: stranka.Email,
+            StevilkaKomunikacije2: stranka.Phone,
+            ImeOsebe: stranka.FirstName + " " + stranka.LastName,
+            PodatekPodjetja: stranka.CustomerId,
+            postavkeRacuna: pesmi
+          }
+        );
+      });
     }
   });
 });

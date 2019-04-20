@@ -331,6 +331,11 @@
 				}
 			}
 
+			var skupnaCena = 0;
+			for (var i = 0; i < postavkeRacuna.length; i++) {
+				skupnaCena += postavkeRacuna[i].cena;
+			}
+
 			var skupniPopust =
 				(postavkeRacuna.length >= 5 ? 20 : 0) +
 				(pesmi > 1 ? 5 : 0) +
@@ -341,6 +346,9 @@
 					break;
 				}
 			}
+			if (skupnaCena >= 14.5) skupniPopust += 4.5;
+			else if (skupnaCena >= 9.5) skupniPopust += 3;
+			else if (skupnaCena >= 5) skupniPopust += 2;
 
 			var vsotaSPopustiInDavki = 0,
 					vsotaZneskovDdv = 0,
