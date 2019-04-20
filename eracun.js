@@ -305,32 +305,54 @@ var vrniRacune = function(povratniKlic) {
 streznik.post("/prijava", function(zahteva, odgovor) {
   var form = new formidable.IncomingForm();
   form.parse(zahteva, function (napaka, polja, datoteke) {
-    pb.run(
-      "INSERT INTO Customer (FirstName, LastName, Company, \
-                            Address, City, State, Country, PostalCode, \
-                            Phone, Fax, Email, SupportRepId) \
-      VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
-              $fax, $email, $sri)",
-      {$fn: polja.FirstName, $ln: polja.LastName,
-      $com: polja.Company, $addr: polja.Address, $city: polja.City, $state: polja.State, $country: polja.Country,
-      $pc: polja.PostalCode, $phone: polja.Phone, $fax: polja.Fax, $email: polja.Email, $sri: 9},
-      function(napaka) {
-        console.log(polja);
-        vrniStranke(function(napaka1, stranke) {
-          vrniRacune(function(napaka2, racuni) {
-            odgovor.render(
-              "prijava",
-              {
-                sporocilo: napaka ? "Prišlo je do napake pri dodajanju nove stranke. Prosim, preverite vnešene podatke in poskusite znova."
-                : "Stranka " + polja.FirstName + " " + polja.LastName + " je bila uspešno dodana.",
-                seznamStrank: stranke,
-                seznamRacunov: racuni
-              }
-            );
-          });
-        });
+    var izpolnjenaPolja = true;
+    for (var i = 0; i < Object.keys(polja).length; i++) {
+      if (polja[Object.keys(polja)[i]] == "") {
+        izpolnjenaPolja = false;
+        break;
       }
-    );
+    }
+    if (izpolnjenaPolja) {
+      pb.run(
+        "INSERT INTO Customer (FirstName, LastName, Company, \
+                              Address, City, State, Country, PostalCode, \
+                              Phone, Fax, Email, SupportRepId) \
+        VALUES  ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
+                $fax, $email, $sri)",
+        {$fn: polja.FirstName, $ln: polja.LastName,
+        $com: polja.Company, $addr: polja.Address, $city: polja.City, $state: polja.State, $country: polja.Country,
+        $pc: polja.PostalCode, $phone: polja.Phone, $fax: polja.Fax, $email: polja.Email, $sri: 9},
+        function(napaka) {
+          vrniStranke(function(napaka1, stranke) {
+            vrniRacune(function(napaka2, racuni) {
+              odgovor.render(
+                "prijava",
+                {
+                  sporocilo: napaka ? "Prišlo je do napake pri dodajanju nove stranke. Prosim, preverite vnešene podatke in poskusite znova."
+                  : "Stranka " + polja.FirstName + " " + polja.LastName + " je bila uspešno dodana.",
+                  seznamStrank: stranke,
+                  seznamRacunov: racuni
+                }
+              );
+            });
+          });
+        }
+      );
+    }
+    else {
+      vrniStranke(function(napaka1, stranke) {
+        vrniRacune(function(napaka2, racuni) {
+          odgovor.render(
+            "prijava",
+            {
+              sporocilo: "Prišlo je do napake pri dodajanju nove stranke. Prosim, preverite vnešene podatke in poskusite znova.",
+              seznamStrank: stranke,
+              seznamRacunov: racuni
+            }
+          );
+        });
+      });
+    }
   });
 });
 

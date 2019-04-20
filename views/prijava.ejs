@@ -165,12 +165,6 @@
 		const country    = document.getElementById("Country");
 		const dropdown   = document.querySelector(".dropdown-menu");
 
-		const ostalaPolja = [ document.getElementById("FirstName"),
-													document.getElementById("LastName"), document.getElementById("Company"),
-													document.getElementById("State"),
-													document.getElementById("Phone"),
-													document.getElementById("Fax") ]
-
 		var validEmail = false;
 
 		city.addEventListener("keyup", function() {
@@ -201,8 +195,6 @@
 			}
 			enableRegister();
 		});
-
-		for (var i = 0; i < ostalaPolja.length; i++) ostalaPolja[i].addEventListener("keyup", enableRegister);
 
 		function autocomplete(zacetnice) {
 			dropdown.innerHTML = "";
@@ -236,14 +228,8 @@
 		}
 
 		function enableRegister() {
-			var prazno = false;
-			for (var i = 0; i < ostalaPolja.length; i++) {
-				if (ostalaPolja[i].value == "") {
-					register.disabled = true;
-					return;
-				}
-			}
-			if (validEmail) register.disabled = false;
+			if (city.value != "" && postalCode.value != "" && validEmail) register.disabled = false;
+			else register.disabled = true;
 		}
 	});
 
