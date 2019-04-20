@@ -174,7 +174,7 @@
 				<VrstaPartnerja>BY</VrstaPartnerja>
 				<NazivPartnerja>
 					<NazivPartnerja1><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
-						 									 FirstName != null ? FirstName : "" + " " + LastName != null ? LastName : "" %></NazivPartnerja1>
+						 									 (FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></NazivPartnerja1>
 				</NazivPartnerja>
 				<Ulica>
 					<Ulica1><%= Address != null ? Address : "Večna pot 113" %></Ulica1>
@@ -208,7 +208,7 @@
 			<KontaktiPodjetja>
 				<KontaktnaOseba>
 					<ImeOsebe><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
-						 						FirstName != null ? FirstName : "" + " " + LastName != null ? LastName : "" %></ImeOsebe>
+						 						(FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></ImeOsebe>
 				</KontaktnaOseba>
 				<Komunikacije>
 					<StevilkaKomunikacije><%= Email != null ? Email : "gmail@chucknorris.com" %></StevilkaKomunikacije>
