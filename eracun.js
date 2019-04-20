@@ -163,7 +163,12 @@ var pesmiIzKosarice = function(zahteva, povratniKlic) {
 // Vrni podrobnosti pesmi v košarici iz trenutne seje vključno s časom izvajanja
 streznik.get("/podrobnosti", function(zahteva, odgovor) {
     var pesmi = zahteva.session.kosarica ? zahteva.session.kosarica.length : 0;
-    var cas = casIzvajanjaKosarice(zahteva, function() { return cas; });
+    var cas = casIzvajanjaKosarice(zahteva, function(cas) {
+      odgovor.send({
+                    pesmi: pesmi,
+                    cas: cas }
+                  );
+    });
 });
 
 // Vrni čas izvajanja pesmi v košarici iz podatkovne baze
@@ -193,6 +198,17 @@ streznik.get("/kosarica", function(zahteva, odgovor) {
     else
       odgovor.send(pesmi);
   });
+});
+
+streznik.get("/izbrisiKosarico", function(zahteva, odgovor) {
+  if (!zahteva.session.kosarica || zahteva.session.kosarica.length == 0) {
+    odgovor.send(true);
+  }
+  else {
+    zahteva.session.kosarica = null;
+    odgovor.send(false);
+  }
+  console.log(zahteva.session.kosarica);
 });
 
 // Vrni podrobnosti pesmi na računu
