@@ -173,14 +173,16 @@
 			<NazivNaslovPodjetja>
 				<VrstaPartnerja>BY</VrstaPartnerja>
 				<NazivPartnerja>
-					<NazivPartnerja1><%= NazivPartnerja1 != null ? NazivPartnerja1 : "Univerza v Ljubljani" %></NazivPartnerja1>
+					<NazivPartnerja1><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
+						 									 FirstName != null ? FirstName : "" + " " + LastName != null ? LastName : "" %></NazivPartnerja1>
 				</NazivPartnerja>
 				<Ulica>
-					<Ulica1><%= Ulica1 != null ? Ulica1 : "Večna pot 113" %></Ulica1>
+					<Ulica1><%= Address != null ? Address : "Večna pot 113" %></Ulica1>
 				</Ulica>
-				<Kraj><%= Kraj != null ? Kraj : "Ljubljana" %></Kraj>
-				<NazivDrzave><%= NazivDrzave != null ? NazivDrzave : "Slovenija" %></NazivDrzave>
-				<PostnaStevilka><%= PostnaStevilka != null ? PostnaStevilka : "SI" %></PostnaStevilka>
+				<Kraj><%= City != null ? City : "Ljubljana" %></Kraj>
+				<NazivDrzave><%= Country == null && State == null ? "Slovenija" :
+					 							 Country + (State != null ? " (" + State + ")" : "") %></NazivDrzave>
+				<PostnaStevilka><%= PostalCode != null ? PostalCode : "SI" %></PostnaStevilka>
 				<KodaDrzave></KodaDrzave>
 			</NazivNaslovPodjetja>
 			<FinancniPodatkiPodjetja>
@@ -201,18 +203,19 @@
 			</ReferencniPodatkiPodjetja>
 			<ReferencniPodatkiPodjetja>
 				<VrstaPodatkaPodjetja>IT</VrstaPodatkaPodjetja>
-				<PodatekPodjetja><%= PodatekPodjetja != null ? PodatekPodjetja : "11-22-33-44" %></PodatekPodjetja>
+				<PodatekPodjetja><%= CustomerId != null ? CustomerId : "11-22-33-44" %></PodatekPodjetja>
 			</ReferencniPodatkiPodjetja>
 			<KontaktiPodjetja>
 				<KontaktnaOseba>
-					<ImeOsebe><%= ImeOsebe != null ? ImeOsebe : "Dejan Lavbič" %></ImeOsebe>
+					<ImeOsebe><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
+						 						FirstName != null ? FirstName : "" + " " + LastName != null ? LastName : "" %></ImeOsebe>
 				</KontaktnaOseba>
 				<Komunikacije>
-					<StevilkaKomunikacije><%= StevilkaKomunikacije1 != null ? StevilkaKomunikacije1 : "gmail@chucknorris.com" %></StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= Email != null ? Email : "gmail@chucknorris.com" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>EM</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
-					<StevilkaKomunikacije><%= StevilkaKomunikacije2 != null ? StevilkaKomunikacije2 : "38612419350" %></StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= Phone != null ? Phone : "38612419350" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>TE</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
