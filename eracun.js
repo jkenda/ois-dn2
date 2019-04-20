@@ -286,6 +286,8 @@ streznik.get("/izpisiRacun/:oblika", function(zahteva, odgovor) {
         "<p>V košarici nimate nobene pesmi, \
         zato računa ni mogoče pripraviti!</p>"
       );
+    } else if (zahteva.session.trenutnaStranka == null) {
+      odgovor.redirect("/prijava");
     } else {
       stranka(zahteva.session.trenutnaStranka, function(stranka) {
         odgovor.setHeader("Content-Type", "text/xml");
@@ -293,15 +295,16 @@ streznik.get("/izpisiRacun/:oblika", function(zahteva, odgovor) {
           "eslog",
           {
             vizualiziraj: zahteva.params.oblika == "html",
-            NazivPartnerja1: stranka.FirstName + " " + stranka.LastName,
-            Ulica1: stranka.Address,
-            Kraj: stranka.City + " (" + stranka.State + ")",
-            NazivDrzave: stranka.Country,
-            PostnaStevilka: stranka.PostalCode,
-            StevilkaKomunikacije1: stranka.Email,
-            StevilkaKomunikacije2: stranka.Phone,
-            ImeOsebe: stranka.FirstName + " " + stranka.LastName,
-            PodatekPodjetja: stranka.CustomerId,
+            FirstName: stranka.FirstName,
+            LastName: stranka.LastName,
+            Address: stranka.Address,
+            City: stranka.City,
+            State: stranka.State,
+            Country: stranka.Country,
+            PostalCode: stranka.PostalCode,
+            Email: stranka.Email,
+            Phone: stranka.Phone,
+            CustomerId: stranka.CustomerId,
             postavkeRacuna: pesmi
           }
         );
