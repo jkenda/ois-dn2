@@ -279,14 +279,17 @@ streznik.post("/izpisiRacunBaza", function(zahteva, odgovor) {
 });
 
 var stranka = function(strankaId, povratniKlic) {
-  pb.get(
-    "SELECT Customer.* \
-    FROM    Customer \
-    WHERE   Customer.CustomerId = $cid",
-    {},
-    function(napaka, vrstica) {
-      povratniKlic(false);
-    });
+  if (strankaId == null) povratniKlic({});
+  else {
+    pb.get(
+      "SELECT Customer.* \
+      FROM    Customer \
+      WHERE   Customer.CustomerId = $cid",
+      {$cid: strankaId},
+      function(napaka, vrstica) {
+        povratniKlic(vrstica);
+      });
+  }
 };
 
 // Izpis računa v HTML predstavitvi ali izvorni XML obliki
@@ -299,15 +302,29 @@ streznik.get("/izpisiRacun/:oblika", function(zahteva, odgovor) {
         "<p>V košarici nimate nobene pesmi, \
         zato računa ni mogoče pripraviti!</p>"
       );
+    } else if (zahteva.session.trenutnaStranka == null) {
+      odgovor.redirect("/prijava");
     } else {
-      odgovor.setHeader("Content-Type", "text/xml");
-      odgovor.render(
-        "eslog",
-        {
-          vizualiziraj: zahteva.params.oblika == "html",
-          postavkeRacuna: pesmi
-        }
-      );
+      stranka(zahteva.session.trenutnaStranka, function(stranka) {
+        odgovor.setHeader("Content-Type", "text/xml");
+        odgovor.render(
+          "eslog",
+          {
+            vizualiziraj: zahteva.params.oblika == "html",
+            FirstName: stranka.FirstName,
+            LastName: stranka.LastName,
+            Address: stranka.Address,
+            City: stranka.City,
+            State: stranka.State,
+            Country: stranka.Country,
+            PostalCode: stranka.PostalCode,
+            Email: stranka.Email,
+            Phone: stranka.Phone,
+            CustomerId: stranka.CustomerId,
+            postavkeRacuna: pesmi
+          }
+        );
+      });
     }
   });
 });
