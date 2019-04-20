@@ -292,7 +292,8 @@ var vrniRacune = function(povratniKlic) {
     "SELECT Customer.FirstName || ' ' || Customer.LastName || \
             ' (' || Invoice.InvoiceId || ') - ' || \
             date(Invoice.InvoiceDate) AS Naziv, \
-            Invoice.InvoiceId \
+            Invoice.InvoiceId, \
+            Invoice.CustomerId \
     FROM    Customer, Invoice \
     WHERE   Customer.CustomerId = Invoice.CustomerId",
     function (napaka, vrstice) {
@@ -325,6 +326,9 @@ streznik.post("/prijava", function(zahteva, odgovor) {
         function(napaka) {
           vrniStranke(function(napaka1, stranke) {
             vrniRacune(function(napaka2, racuni) {
+            for (var i=0; i < stranke.length; i++) {
+              stranke[i].StRacunov = prestejRacuneZaStranko(stranke[i], racuni);
+            }
               odgovor.render(
                 "prijava",
                 {

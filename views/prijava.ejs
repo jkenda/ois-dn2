@@ -109,7 +109,7 @@
 						<select size="10" id="seznamStrank" name="seznamStrank" class="form-control">
 							<% seznamStrank.forEach(function(stranka) { %>
 							<option value="<%= stranka.CustomerId %>">
-								<%= stranka.FirstName %> <%= stranka.LastName %>, <%= stranka.Email %>
+								<%= stranka.FirstName %> <%= stranka.LastName %>, <%= stranka.Email %> :: <%= stranka.Country %> (<%= stranka.StRacunov %>)
 							</option>
 							<% }) %>
 						</select>
@@ -225,6 +225,22 @@
 		function enableRegister() {
 			if (city.value != "" && postalCode.value != "" && validEmail) register.disabled = false;
 			else register.disabled = true;
+		}
+
+		const seznamStrank = document.querySelector("#seznamStrank");
+		seznamStrank.addEventListener("change", highlight);
+
+		function highlight() {
+			var c = 0;
+			const seznamRacunov = document.querySelector("#seznamRacunov");
+			for (var i = 0; i < seznamRacunov.length; i++) {
+				if (seznamStrank.options[seznamStrank.selectedIndex].value == seznamRacunov[i].getAttribute("customerid")) {
+					seznamRacunov[i].className = "racun-stranke";
+					c++;
+				}
+				else seznamRacunov[i].className = "";
+			}
+			console.log(c);
 		}
 	});
 
