@@ -301,8 +301,6 @@ streznik.get("/izpisiRacun/:oblika", function(zahteva, odgovor) {
         "<p>V košarici nimate nobene pesmi, \
         zato računa ni mogoče pripraviti!</p>"
       );
-    } else if (zahteva.session.trenutnaStranka == null) {
-      odgovor.redirect("/prijava");
     } else {
       stranka(zahteva.session.trenutnaStranka, function(stranka) {
         odgovor.setHeader("Content-Type", "text/xml");
