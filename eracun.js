@@ -208,7 +208,6 @@ streznik.get("/izbrisiKosarico", function(zahteva, odgovor) {
     zahteva.session.kosarica = null;
     odgovor.send(false);
   }
-  console.log(zahteva.session.kosarica);
 });
 
 // Vrni podrobnosti pesmi na računu
