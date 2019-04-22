@@ -202,19 +202,18 @@
 			</ReferencniPodatkiPodjetja>
 			<ReferencniPodatkiPodjetja>
 				<VrstaPodatkaPodjetja>IT</VrstaPodatkaPodjetja>
-				<PodatekPodjetja><%= CustomerId != null ? CustomerId : "11-22-33-44" %></PodatekPodjetja>
+				<PodatekPodjetja><%= CustomerId != null ? CustomerId : "" %></PodatekPodjetja>
 			</ReferencniPodatkiPodjetja>
 			<KontaktiPodjetja>
 				<KontaktnaOseba>
-					<ImeOsebe><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
-						 						(FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></ImeOsebe>
+					<ImeOsebe><%= (FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></ImeOsebe>
 				</KontaktnaOseba>
 				<Komunikacije>
-					<StevilkaKomunikacije><%= Email != null ? Email : "gmail@chucknorris.com" %></StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= Email != null ? Email : "" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>EM</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
-					<StevilkaKomunikacije><%= Phone != null ? Phone : "38612419350" %></StevilkaKomunikacije>
+					<StevilkaKomunikacije><%= Phone != null ? Phone : "" %></StevilkaKomunikacije>
 					<VrstaKomunikacije>TE</VrstaKomunikacije>
 				</Komunikacije>
 				<Komunikacije>
