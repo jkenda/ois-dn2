@@ -173,16 +173,15 @@
 			<NazivNaslovPodjetja>
 				<VrstaPartnerja>BY</VrstaPartnerja>
 				<NazivPartnerja>
-					<NazivPartnerja1><%= FirstName == null && LastName == null ? "Univerza v Ljubljani" :
-						 									 (FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></NazivPartnerja1>
+					<NazivPartnerja1><%= (FirstName != null ? FirstName : "") + " " + (LastName != null ? LastName : "") %></NazivPartnerja1>
 				</NazivPartnerja>
 				<Ulica>
-					<Ulica1><%= Address != null ? Address : "Večna pot 113" %></Ulica1>
+					<Ulica1><%= Address != null ? Address : "" %></Ulica1>
 				</Ulica>
-				<Kraj><%= City != null ? City : "Ljubljana" %></Kraj>
-				<NazivDrzave><%= Country == null && State == null ? "Slovenija" :
+				<Kraj><%= City != null ? City : "" %></Kraj>
+				<NazivDrzave><%= Country == null && State == null ? "" :
 					 							 Country + (State != null ? " (" + State + ")" : "") %></NazivDrzave>
-				<PostnaStevilka><%= PostalCode != null ? PostalCode : "SI" %></PostnaStevilka>
+				<PostnaStevilka><%= PostalCode != null ? PostalCode : "" %></PostnaStevilka>
 				<KodaDrzave></KodaDrzave>
 			</NazivNaslovPodjetja>
 			<FinancniPodatkiPodjetja>
